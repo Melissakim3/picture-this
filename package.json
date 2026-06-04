@@ -1,0 +1,8 @@
+{
+  "name": "picture-this",
+  "version": "1.0.0",
+  "description": "Real Life English Unit Generator",
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}

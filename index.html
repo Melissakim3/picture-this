@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Picture This! — Real Life English Unit Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: #E2DDD5;
+    --border2: #CCC8BF;
+    --text: #1A1814;
+    --text2: #6B6560;
+    --text3: #9E9890;
+    --accent: #2D5A3D;
+    --accent-light: #EAF2EC;
+    --accent2: #C17D3C;
+    --accent2-light: #FBF3E8;
+    --blue: #2B4C8C;
+    --blue-light: #EBF0F9;
+    --purple: #5C3D8F;
+    --purple-light: #F0EBF9;
+    --red: #C0392B;
+    --red-light: #FBECEA;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .logo span { color: var(--accent); font-style: italic; }
+  .header-sub { font-size: 12px; color: var(--text3); }
+
+  /* LAYOUT */
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  /* INPUT PANEL */
+  .input-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .panel-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+  .input-row { display: flex; gap: 10px; }
+  textarea {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    resize: none;
+    min-height: 72px;
+    transition: border-color 0.15s;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  textarea::placeholder { color: var(--text3); }
+
+  .gen-btn {
+    padding: 0 22px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 110px;
+    justify-content: center;
+  }
+  .gen-btn:hover { background: #234a31; }
+  .gen-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .gen-btn svg { width: 16px; height: 16px; }
+
+  /* QUICK TAGS */
+  .quick-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .qtag {
+    padding: 5px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.12s;
+    user-select: none;
+  }
+  .qtag:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  /* TABS */
+  .tabs-wrap {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 5px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 9px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 400;
+  }
+  .tab-btn.active {
+    background: var(--text);
+    color: #fff;
+    font-weight: 500;
+  }
+  .tab-btn .num {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 11px;
+    margin-left: 4px;
+  }
+  .tab-btn:not(.active) .num {
+    background: var(--border);
+    color: var(--text3);
+  }
+
+  /* OUTPUT PANELS */
+  .output-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+  .output-panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--text3);
+  }
+  .empty-state .icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    opacity: 0.4;
+  }
+  .empty-state p { font-size: 14px; }
+
+  /* LOADER */
+  .loader { display: flex; gap: 6px; justify-content: center; align-items: center; padding: 4rem 0; }
+  .loader span {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    animation: bob 1.2s ease-in-out infinite;
+    opacity: 0.3;
+  }
+  .loader span:nth-child(2) { animation-delay: 0.2s; }
+  .loader span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bob { 0%,80%,100%{opacity:0.3;transform:scale(0.8)} 40%{opacity:1;transform:scale(1.1)} }
+
+  /* SECTION HEADERS */
+  .sec-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+
+  /* LEVEL BADGES */
+  .level-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 16px 0 8px;
+    letter-spacing: 0.04em;
+  }
+  .level-tag.basic { background: var(--accent-light); color: var(--accent); }
+  .level-tag.inter { background: var(--blue-light); color: var(--blue); }
+  .level-tag.adv { background: var(--purple-light); color: var(--purple); }
+  .level-tag:first-child { margin-top: 0; }
+
+  /* SENTENCES */
+  .sent-list { list-style: none; }
+  .sent-item {
+    display: flex;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .sent-item:last-child { border-bottom: none; }
+  .sent-n {
+    min-width: 22px;
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 600;
+    padding-top: 3px;
+  }
+
+  /* VOCAB TABLE */
+  .vocab-wrap { margin-top: 1.5rem; }
+  .vocab-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .vocab-table th {
+    text-align: left;
+    padding: 7px 10px;
+    background: var(--bg);
+    color: var(--text3);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .vocab-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .vocab-table tr:last-child td { border-bottom: none; }
+  .vocab-word { font-weight: 500; color: var(--text); }
+  .vocab-ko { color: var(--text2); }
+  .vocab-ex { color: var(--text3); font-style: italic; }
+
+  /* TOPIC CARDS */
+  .topic-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 10px;
+  }
+  .topic-card:last-child { margin-bottom: 0; }
+  .topic-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .topic-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+  }
+  .topic-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .topic-sub { font-size: 12px; color: var(--text3); }
+  .topic-qs { list-style: none; margin-bottom: 10px; }
+  .topic-qs li {
+    font-size: 13px;
+    color: var(--text2);
+    padding: 3px 0 3px 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .topic-qs li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--text3);
+    font-size: 11px;
+    top: 5px;
+  }
+  .debate-row {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--text2);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .debate-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding-top: 1px;
+  }
+
+  /* NEWSLETTER */
+  .nl-template {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem;
+    font-family: 'DM Sans', monospace;
+    font-size: 12.5px;
+    line-height: 1.85;
+    color: var(--text2);
+    white-space: pre-wrap;
+    margin-bottom: 1.25rem;
+  }
+  .checklist-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 1.5rem; }
+  .check-pill {
+    padding: 5px 12px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .sample-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .sample-header {
+    background: var(--text);
+    color: #fff;
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+  .sample-body { padding: 1rem 1.1rem; }
+  .sample-section { margin-bottom: 1rem; }
+  .sample-section:last-child { margin-bottom: 0; }
+  .sample-key {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 5px;
+  }
+  .sample-text { font-size: 13px; line-height: 1.7; color: var(--text); }
+  .sample-quote {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--accent);
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+    margin-top: 4px;
+  }
+
+  /* ERROR */
+  .err-msg {
+    text-align: center;
+    padding: 2rem;
+    color: var(--red);
+    font-size: 13px;
+  }
+
+  /* SCENE TAG */
+  .scene-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+
+  @media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .input-row { flex-direction: column; }
+    .gen-btn { width: 100%; padding: 12px; }
+    .tab-btn { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Picture <span>This!</span></div>
+  <div class="header-sub">Real Life English Unit Generator</div>
+</header>
+
+<div class="container">
+
+  <!-- INPUT -->
+  <div class="input-panel">
+    <div class="panel-label">상황 입력</div>
+    <div class="input-row">
+      <textarea id="topicInput" placeholder="예) 카페에서 커스텀 음료 주문하는 장면&#10;예) 공항 보안검색대 통과하는 장면" rows="3"></textarea>
+      <button class="gen-btn" id="genBtn" onclick="generateAll()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        생성하기
+      </button>
+    </div>
+    <div class="quick-tags">
+      <span class="qtag" onclick="setT('약국에서 처방전 받고 약 설명 듣는 장면')">💊 약국</span>
+      <span class="qtag" onclick="setT('지하철 노선도 보며 환승하는 장면')">🚇 지하철</span>
+      <span class="qtag" onclick="setT('레스토랑에서 음식이 잘못 나와 웨이터에게 항의하는 장면')">🍽️ 레스토랑 컴플레인</span>
+      <span class="qtag" onclick="setT('회사 면접을 보는 장면')">💼 면접</span>
+      <span class="qtag" onclick="setT('미용실에서 원하는 헤어스타일을 설명하는 장면')">✂️ 미용실</span>
+      <span class="qtag" onclick="setT('공항 보안검색대를 통과하는 장면')">✈️ 공항</span>
+      <span class="qtag" onclick="setT('처음 만난 사람에게 자기소개하는 파티 장면')">🤝 자기소개</span>
+      <span class="qtag" onclick="setT('이웃에게 층간소음을 항의하는 장면')">🏠 층간소음</span>
+      <span class="qtag" onclick="setT('호텔 체크인하면서 문제를 해결하는 장면')">🏨 호텔</span>
+      <span class="qtag" onclick="setT('은행에서 계좌 개설하는 장면')">🏦 은행</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-wrap" id="tabsWrap" style="display:none">
+    <button class="tab-btn active" onclick="switchTab('s1', this)">
+      Stage 1 — 그림 묘사 <span class="num">30문장</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('s2', this)">
+      Stage 2 — 주제 말하기 <span class="num">5 topics</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('s3', this)">
+      Stage 3 — 뉴스레터 <span class="num">쓰기</span>
+    </button>
+  </div>
+
+  <!-- OUTPUTS -->
+  <div class="output-panel active" id="welcome">
+    <div class="empty-state">
+      <div class="icon">📸</div>
+      <p>상황을 입력하거나 태그를 클릭해서<br>Unit을 자동 생성해 보세요</p>
+    </div>
+  </div>
+
+  <div class="output-panel" id="s1"></div>
+  <div class="output-panel" id="s2"></div>
+  <div class="output-panel" id="s3"></div>
+
+</div>
+
+<script>
+const API = '/api/proxy';
+const MODEL = 'claude-sonnet-4-20250514';
+
+function setT(t) { document.getElementById('topicInput').value = t; }
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['s1','s2','s3','welcome'].forEach(p => {
+    const el = document.getElementById(p);
+    el.classList.remove('active');
+    el.style.display = 'none';
+  });
+  const target = document.getElementById(id);
+  target.style.display = 'block';
+  target.classList.add('active');
+}
+
+function showLoader(id) {
+  const el = document.getElementById(id);
+  el.innerHTML = '<div class="loader"><span></span><span></span><span></span></div>';
+  el.style.display = 'block';
+}
+
+async function callAPI(system, user) {
+  const res = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 1000,
+      system,
+      messages: [{ role: 'user', content: user }]
+    })
+  });
+  const data = await res.json();
+  if (!data.content) throw new Error(data.error?.message || 'API error');
+  return data.content[0].text;
+}
+
+async function generateAll() {
+  const topic = document.getElementById('topicInput').value.trim();
+  if (!topic) return;
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path d="M9 12h6"/></svg> 생성중...';
+
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('welcome').classList.remove('active');
+  document.getElementById('tabsWrap').style.display = 'flex';
+
+  showLoader('s1'); showLoader('s2'); showLoader('s3');
+
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  ['s1','s2','s3'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.style.display = i === 0 ? 'block' : 'none';
+    if (i === 0) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+
+  const style = document.createElement('style');
+  style.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+  document.head.appendChild(style);
+
+  await Promise.all([
+    doStage1(topic),
+    doStage2(topic),
+    doStage3(topic)
+  ]);
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> 생성하기';
+}
+
+async function doStage1(topic) {
+  const sys = `You are an expert EFL curriculum designer. Generate exactly 30 picture description sentences for adult English conversation learners.
+
+Respond ONLY with valid JSON, no markdown fences, no extra text:
+{
+  "basic": ["sentence 1", ..., "sentence 10"],
+  "intermediate": ["sentence 11", ..., "sentence 20"],
+  "advanced": ["sentence 21", ..., "sentence 30"],
+  "vocabulary": [
+    {"word": "...", "korean": "...", "example": "..."},
+    {"word": "...", "korean": "...", "example": "..."},
+    {"word": "...", "korean": "...", "example": "..."},
+    {"word": "...", "korean": "...", "example": "..."},
+    {"word": "...", "korean": "...", "example": "..."}
+  ]
+}
+
+Rules:
+- Basic (1-10): Simple present tense, direct visible observations, short sentences
+- Intermediate (11-20): Inference, emotion, body language, comparisons
+- Advanced (21-30): Cultural commentary, atmosphere, societal insight, complex grammar
+- All 30 sentences describe the SAME scene with increasing depth`;
+
+  try {
+    const raw = await callAPI(sys, `Scene: ${topic}`);
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderS1(data, topic);
+  } catch(e) {
+    document.getElementById('s1').innerHTML = `<div class="err-msg">오류: ${e.message}</div>`;
+  }
+}
+
+async function doStage2(topic) {
+  const sys = `You are an expert EFL conversation curriculum designer. Generate 5 discussion topic cards.
+
+Respond ONLY with valid JSON, no markdown fences:
+{
+  "topics": [
+    {
+      "num": "01",
+      "title": "Topic title",
+      "subtitle": "Korean subtitle — 이 장면과의 연결",
+      "questions": ["Q1?", "Q2?", "Q3?"],
+      "debate": "Debate statement that sparks genuine disagreement"
+    }
+  ]
+}
+
+Rules:
+- Each topic expands from the scene to a broader life theme
+- Questions should provoke genuine thought for adults
+- Cover: personal, cultural, ethical, economic, philosophical angles
+- Debate statements should be genuinely controversial`;
+
+  try {
+    const raw = await callAPI(sys, `Scene: ${topic}`);
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderS2(data, topic);
+  } catch(e) {
+    document.getElementById('s2').innerHTML = `<div class="err-msg">오류: ${e.message}</div>`;
+  }
+}
+
+async function doStage3(topic) {
+  const sys = `You are an expert EFL curriculum designer. Create a newsletter writing activity.
+
+Respond ONLY with valid JSON, no markdown fences:
+{
+  "template": "Full newsletter template with ___ for blanks",
+  "checklist": ["expression 1", "expression 2", "expression 3", "expression 4", "expression 5"],
+  "sample": {
+    "scene": "2-3 sentence vivid scene description",
+    "opinion": "4-5 sentences of genuine adult opinion",
+    "expressions": ["expression used 1", "expression used 2", "expression used 3"],
+    "quote": "One memorable closing sentence in English"
+  }
+}`;
+
+  try {
+    const raw = await callAPI(sys, `Scene: ${topic}`);
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderS3(data, topic);
+  } catch(e) {
+    document.getElementById('s3').innerHTML = `<div class="err-msg">오류: ${e.message}</div>`;
+  }
+}
+
+function renderS1(d, topic) {
+  const el = document.getElementById('s1');
+  const levels = [
+    { key:'basic', label:'Basic', sub:'1–10', cls:'basic' },
+    { key:'intermediate', label:'Intermediate', sub:'11–20', cls:'inter' },
+    { key:'advanced', label:'Advanced', sub:'21–30', cls:'adv' }
+  ];
+  let n = 1, html = `<div class="scene-tag">📸 ${topic}</div>`;
+
+  levels.forEach(lv => {
+    html += `<div class="level-tag ${lv.cls}">${lv.label} <span style="opacity:.6;font-weight:400">(${lv.sub})</span></div>`;
+    html += '<ul class="sent-list">';
+    (d[lv.key]||[]).forEach(s => {
+      html += `<li class="sent-item"><span class="sent-n">${n++}</span><span>${s}</span></li>`;
+    });
+    html += '</ul>';
+  });
+
+  html += '<div class="divider"></div><div class="vocab-wrap">';
+  html += '<div class="sec-label">핵심 어휘</div>';
+  html += '<table class="vocab-table"><thead><tr><th>Word / Phrase</th><th>뜻</th><th>Example sentence</th></tr></thead><tbody>';
+  (d.vocabulary||[]).forEach(v => {
+    html += `<tr><td class="vocab-word">${v.word}</td><td class="vocab-ko">${v.korean}</td><td class="vocab-ex">${v.example}</td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+function renderS2(d, topic) {
+  const el = document.getElementById('s2');
+  let html = `<div class="scene-tag">💬 ${topic}</div>`;
+  (d.topics||[]).forEach(t => {
+    html += `<div class="topic-card">
+      <div class="topic-header">
+        <span class="topic-num">TOPIC ${t.num}</span>
+        <div>
+          <div class="topic-title">${t.title}</div>
+          <div class="topic-sub">${t.subtitle}</div>
+        </div>
+      </div>
+      <ul class="topic-qs">`;
+    (t.questions||[]).forEach(q => { html += `<li>${q}</li>`; });
+    html += `</ul>
+      <div class="debate-row">
+        <span class="debate-label">Debate</span>
+        <span>"${t.debate}" — Agree or disagree?</span>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function renderS3(d, topic) {
+  const el = document.getElementById('s3');
+  const s = d.sample || {};
+  let html = `<div class="scene-tag">✍️ ${topic}</div>`;
+  html += '<div class="sec-label">뉴스레터 템플릿</div>';
+  html += `<div class="nl-template">${d.template||''}</div>`;
+
+  if ((d.checklist||[]).length) {
+    html += '<div class="sec-label">체크리스트 — 이 표현 5개를 꼭 사용하세요</div>';
+    html += '<div class="checklist-row">';
+    d.checklist.forEach(c => { html += `<span class="check-pill">${c}</span>`; });
+    html += '</div>';
+  }
+
+  html += `<div class="sample-card">
+    <div class="sample-header">모범 답안 예시</div>
+    <div class="sample-body">
+      <div class="sample-section">
+        <div class="sample-key">This week's scene</div>
+        <div class="sample-text">${s.scene||''}</div>
+      </div>
+      <div class="sample-section">
+        <div class="sample-key">What it made me think about</div>
+        <div class="sample-text">${s.opinion||''}</div>
+      </div>`;
+
+  if ((s.expressions||[]).length) {
+    html += `<div class="sample-section">
+      <div class="sample-key">Expressions used</div>
+      <div class="sample-text">`;
+    s.expressions.forEach((e,i) => { html += `${i+1}. ${e}<br>`; });
+    html += '</div></div>';
+  }
+
+  html += `<div class="sample-section">
+      <div class="sample-key">Sentence of the week</div>
+      <div class="sample-quote">"${s.quote||''}"</div>
+    </div>
+    </div>
+  </div>`;
+
+  el.innerHTML = html;
+}
+</script>
+</body>
+</html>
